@@ -1,0 +1,26 @@
+{
+    "name": "com.google.xr.cardboard",
+    "displayName": "Google Cardboard XR Plugin for Unity",
+    "version": "1.1.0",
+    "unity": "2019.3",
+    "description": "Provides rendering and input support for Google Cardboard.",
+    "keywords": [
+        "google",
+        "cardboard",
+        "vr",
+        "xr",
+        "reality",
+        "xreditorsubsystem"
+    ],
+    "dependencies": {
+        "com.unity.xr.management": "3.2.9",
+        "com.unity.xr.legacyinputhelpers": "2.1.4"
+    },
+    "samples": [
+        {
+            "displayName": "Hello Cardboard",
+            "description": "Basic sample, minimal project setup.",
+            "path": "Samples~/hellocardboard-unity"
+        }
+    ]
+}

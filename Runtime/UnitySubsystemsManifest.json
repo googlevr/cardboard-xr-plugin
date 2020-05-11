@@ -1,0 +1,15 @@
+{
+	"name": "Cardboard",
+	"version": "1.0.0",
+	"libraryName": "CardboardXrProvider",
+	"displays": [
+		{
+			"id": "Display"
+		}
+	],
+	"inputs": [
+		{
+			"id": "Input"
+		}
+	]
+}
