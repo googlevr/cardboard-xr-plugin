@@ -16,7 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if UNITY_EDITOR
+#if (UNITY_EDITOR && UNITY_IOS)
 
 namespace Google.XR.Cardboard.Editor
 {
