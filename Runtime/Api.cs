@@ -29,7 +29,7 @@ namespace Google.XR.Cardboard
     /// </summary>
     public static class Api
     {
-        private static int s_DeviceParamsCount = -1;
+        private static int _deviceParamsCount = -1;
 
         /// <summary>
         /// Gets a value indicating whether the close button is pressed this frame.
@@ -107,7 +107,7 @@ namespace Google.XR.Cardboard
 
             Debug.Log("[CardboardApi] Device params found.");
             CardboardQrCode_destroy(encodedDeviceParams);
-            s_DeviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
             return true;
         }
 
@@ -116,7 +116,7 @@ namespace Google.XR.Cardboard
         /// </summary>
         public static void ScanDeviceParams()
         {
-            s_DeviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
             Debug.Log("[CardboardApi] QR Code scanning activity launched.");
             CardboardQrCode_scanQrCodeAndSaveDeviceParams();
         }
@@ -129,12 +129,12 @@ namespace Google.XR.Cardboard
         public static bool HasNewDeviceParams()
         {
             // TODO(b/156501367):  Move this logic to the XR display provider.
-            if (s_DeviceParamsCount == -1)
+            if (_deviceParamsCount == -1)
             {
               return false;
             }
 
-            return s_DeviceParamsCount != CardboardQrCode_getQrCodeScanCount();
+            return _deviceParamsCount != CardboardQrCode_getQrCodeScanCount();
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Google.XR.Cardboard
         {
             // TODO(b/156501367):  Move this logic to the XR display provider.
             Debug.Log("[CardboardApi] Reload device parameters.");
-            s_DeviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
             CardboardUnity_setDeviceParametersChanged();
         }
 
@@ -161,7 +161,7 @@ namespace Google.XR.Cardboard
         [DllImport(ApiConstants.CardboardApi)]
         private static extern int CardboardQrCode_getQrCodeScanCount();
 
-        [DllImport(ApiConstants.CardboardXRUnity)]
+        [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setDeviceParametersChanged();
     }
 }

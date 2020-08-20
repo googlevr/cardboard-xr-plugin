@@ -22,19 +22,10 @@ namespace Google.XR.Cardboard
     {
 #if UNITY_ANDROID
         public const string CardboardApi = "cardboard_api";
-        public const string AndroidCardboardApi = "cardboard_api";
-        public const string UnityCardboardJni = "cardboard_unity_jni";
-        public const string CardboardXRUnity = "cardboard_xr_unity";
 #elif UNITY_IOS
         public const string CardboardApi = "__Internal";
-        public const string AndroidCardboardApi = "NOT_AVAILABLE";
-        public const string UnityCardboardJni = "NOT_AVAILABLE";
-        public const string CardboardXRUnity = "__Internal";
 #elif UNITY_EDITOR
         public const string CardboardApi = "NOT_AVAILABLE";
-        public const string AndroidCardboardApi = "NOT_AVAILABLE";
-        public const string UnityCardboardJni = "NOT_AVAILABLE";
-        public const string CardboardXRUnity = "NOT_AVAILABLE";
 #endif
     }
 }

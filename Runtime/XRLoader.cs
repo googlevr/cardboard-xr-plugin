@@ -31,10 +31,10 @@ namespace Google.XR.Cardboard
     /// </summary>
     public class XRLoader : XRLoaderHelper
     {
-        private static List<XRDisplaySubsystemDescriptor> s_DisplaySubsystemDescriptors =
+        private static List<XRDisplaySubsystemDescriptor> _displaySubsystemDescriptors =
             new List<XRDisplaySubsystemDescriptor>();
 
-        private static List<XRInputSubsystemDescriptor> s_InputSubsystemDescriptors =
+        private static List<XRInputSubsystemDescriptor> _inputSubsystemDescriptors =
             new List<XRInputSubsystemDescriptor>();
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace Google.XR.Cardboard
         {
             CardboardSDKInitialize();
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(
-                s_DisplaySubsystemDescriptors, "Display");
+                _displaySubsystemDescriptors, "Display");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(
-                s_InputSubsystemDescriptors, "Input");
+                _inputSubsystemDescriptors, "Input");
             return true;
         }
 
@@ -131,18 +131,20 @@ namespace Google.XR.Cardboard
                     alignmentRect.y, alignmentRect.width, alignmentRect.height);
         }
 
-        [DllImport(ApiConstants.CardboardXRUnity)]
+        [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setScreenParams(
             int x, int y, int width, int height);
 
-        [DllImport(ApiConstants.CardboardXRUnity)]
+        [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setWidgetCount(int count);
 
-        [DllImport(ApiConstants.CardboardXRUnity)]
+        [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setWidgetParams(
             int i, IntPtr texture, int x, int y, int width, int height);
 
-        [DllImport(ApiConstants.UnityCardboardJni)]
+#if UNITY_ANDROID
+        [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_initializeAndroid(IntPtr context);
+#endif
     }
 }

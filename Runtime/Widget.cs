@@ -29,24 +29,24 @@ namespace Google.XR.Cardboard
         /// <summary>
         /// Width and height of the gear and close buttons in device-independent pixels.
         /// </summary>
-        private const int k_ButtonSizeDp = 42;
+        private const int _buttonSizeDp = 42;
 
         /// <summary>
         /// Padding for the gear and close buttons in device-independent pixels.
         ///
         /// Padding behaves like CSS padding, it is clickable but with no content rendered.
         /// </summary>
-        private const int k_ButtonPaddingDp = 9;
+        private const int _buttonPaddingDp = 9;
 
         /// <summary>
         /// Width of the alignment rectangle in device-independent pixels.
         /// </summary>
-        private const int k_AlignmentWidthDp = 2;
+        private const int _alignmentWidthDp = 2;
 
         /// <summary>
         /// Height of the alignment rectangle in millimeters.
         /// </summary>
-        private const int k_AlignmentHeightMm = 24;
+        private const int _alignmentHeightMm = 24;
 
         /// <summary>
         /// Gets the rectangle for the close button in pixels in full screen coordinates.
@@ -57,9 +57,9 @@ namespace Google.XR.Cardboard
             {
                 RectInt rect = new RectInt();
                 rect.x = (int)Screen.safeArea.xMin;
-                rect.width = DpToPixels(k_ButtonSizeDp);
-                rect.y = (int)Screen.safeArea.yMax - DpToPixels(k_ButtonSizeDp);
-                rect.height = DpToPixels(k_ButtonSizeDp);
+                rect.width = DpToPixels(_buttonSizeDp);
+                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp);
+                rect.height = DpToPixels(_buttonSizeDp);
                 return rect;
             }
         }
@@ -75,7 +75,7 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = TranslateToSafeAreaFrame(CloseButtonRect);
-                int paddingPixels = DpToPixels(k_ButtonPaddingDp);
+                int paddingPixels = DpToPixels(_buttonPaddingDp);
                 rect.xMin += paddingPixels;
                 rect.xMax -= paddingPixels;
                 rect.yMin += paddingPixels;
@@ -92,10 +92,10 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = new RectInt();
-                rect.x = (int)Screen.safeArea.xMax - DpToPixels(k_ButtonSizeDp);
-                rect.width = DpToPixels(k_ButtonSizeDp);
-                rect.y = (int)Screen.safeArea.yMax - DpToPixels(k_ButtonSizeDp);
-                rect.height = DpToPixels(k_ButtonSizeDp);
+                rect.x = (int)Screen.safeArea.xMax - DpToPixels(_buttonSizeDp);
+                rect.width = DpToPixels(_buttonSizeDp);
+                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp);
+                rect.height = DpToPixels(_buttonSizeDp);
                 return rect;
             }
         }
@@ -111,7 +111,7 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = TranslateToSafeAreaFrame(GearButtonRect);
-                int paddingPixels = DpToPixels(k_ButtonPaddingDp);
+                int paddingPixels = DpToPixels(_buttonPaddingDp);
                 rect.xMin += paddingPixels;
                 rect.xMax -= paddingPixels;
                 rect.yMin += paddingPixels;
@@ -128,11 +128,11 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = new RectInt();
-                int widthPixels = DpToPixels(k_AlignmentWidthDp);
+                int widthPixels = DpToPixels(_alignmentWidthDp);
                 rect.xMin = ((int)Screen.safeArea.width - widthPixels) / 2;
                 rect.xMax = ((int)Screen.safeArea.width + widthPixels) / 2;
                 rect.y = 0;
-                rect.height = MmToPixels(k_AlignmentHeightMm);
+                rect.height = MmToPixels(_alignmentHeightMm);
                 return rect;
             }
         }
