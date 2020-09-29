@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------
 // <copyright file="ApiConstants.cs" company="Google LLC">
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace Google.XR.Cardboard
         public const string CardboardApi = "cardboard_api";
 #elif UNITY_IOS
         public const string CardboardApi = "__Internal";
-#elif UNITY_EDITOR
+#else
         public const string CardboardApi = "NOT_AVAILABLE";
 #endif
     }

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------
 // <copyright file="Api.cs" company="Google LLC">
-// Copyright 2020 Google LLC. All Rights Reserved.
+// Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (Input.touchCount == 0)
+                if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -57,7 +57,7 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (Input.touchCount == 0)
+                if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -76,7 +76,7 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (Input.touchCount == 0)
+                if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -96,6 +96,11 @@ namespace Google.XR.Cardboard
         /// <returns>Whether or not device parameters are found.</returns>
         public static bool HasDeviceParams()
         {
+            if (!XRLoader._isInitialized)
+            {
+              return false;
+            }
+
             IntPtr encodedDeviceParams;
             int size;
             CardboardQrCode_getSavedDeviceParams(out encodedDeviceParams, out size);
@@ -116,6 +121,11 @@ namespace Google.XR.Cardboard
         /// </summary>
         public static void ScanDeviceParams()
         {
+            if (!XRLoader._isInitialized)
+            {
+              return;
+            }
+
             _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
             Debug.Log("[CardboardApi] QR Code scanning activity launched.");
             CardboardQrCode_scanQrCodeAndSaveDeviceParams();
@@ -129,7 +139,7 @@ namespace Google.XR.Cardboard
         public static bool HasNewDeviceParams()
         {
             // TODO(b/156501367):  Move this logic to the XR display provider.
-            if (_deviceParamsCount == -1)
+            if (!XRLoader._isInitialized || _deviceParamsCount == -1)
             {
               return false;
             }
@@ -142,6 +152,11 @@ namespace Google.XR.Cardboard
         /// </summary>
         public static void ReloadDeviceParams()
         {
+            if (!XRLoader._isInitialized)
+            {
+              return;
+            }
+
             // TODO(b/156501367):  Move this logic to the XR display provider.
             Debug.Log("[CardboardApi] Reload device parameters.");
             _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
