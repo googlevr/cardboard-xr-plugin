@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dependencies>
+    <androidPackages>
+        <androidPackage spec="com.android.support:appcompat-v7:28.0.0" />
+        <androidPackage spec="com.android.support:support-v4:28.0.0" />
+        <androidPackage spec="com.google.android.gms:play-services-vision:15.0.2" />
+        <androidPackage spec="com.google.protobuf:protobuf-lite:3.0.0" />
+    </androidPackages>
+</dependencies>
