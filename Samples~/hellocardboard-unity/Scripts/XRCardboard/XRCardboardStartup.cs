@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------
 // <copyright file="CardboardStartup.cs" company="Google LLC">
-// Copyright 2020 Google LLC
+// Copyright 2020 Google LLC. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using UnityEngine;
 /// <summary>
 /// Initializes Cardboard XR Plugin.
 /// </summary>
-public class CardboardStartup : MonoBehaviour
+public class XRCardboardStartup : MonoBehaviour
 {
     /// <summary>
     /// Start is called before the first frame update.
@@ -50,11 +50,6 @@ public class CardboardStartup : MonoBehaviour
         if (Api.IsGearButtonPressed)
         {
             Api.ScanDeviceParams();
-        }
-
-        if (Api.IsCloseButtonPressed)
-        {
-            Application.Quit();
         }
 
         if (Api.HasNewDeviceParams())
