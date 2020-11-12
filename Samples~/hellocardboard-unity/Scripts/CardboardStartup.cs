@@ -61,5 +61,7 @@ public class CardboardStartup : MonoBehaviour
         {
             Api.ReloadDeviceParams();
         }
+
+        Api.UpdateScreenParams();
     }
 }

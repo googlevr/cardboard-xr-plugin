@@ -30,6 +30,7 @@ namespace Google.XR.Cardboard
     public static class Api
     {
         private static int _deviceParamsCount = -1;
+        private static Rect _cachedSafeArea;
 
         /// <summary>
         /// Gets a value indicating whether the close button is pressed this frame.
@@ -161,6 +162,31 @@ namespace Google.XR.Cardboard
             Debug.Log("[CardboardApi] Reload device parameters.");
             _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
             CardboardUnity_setDeviceParametersChanged();
+        }
+
+        /// <summary>
+        /// Updates screen parameters. This method must be called at framerate to ensure the safe
+        /// area is properly taken into account on iOS devices.
+        ///
+        /// Note: This method is a workaround for
+        /// <a href=https://fogbugz.unity3d.com/default.asp?1288515_t9gqdh39urj13div>Issue #1288515</a>
+        /// in Unity.
+        /// </summary>
+        public static void UpdateScreenParams()
+        {
+            // TODO(b/171702321): Remove this method once the safe area size could be properly
+            // fetched by the XRLoader.
+            if (!XRLoader._isInitialized)
+            {
+                return;
+            }
+
+            // Only recalculate rectangles if safe area size has changed since last check.
+            if (_cachedSafeArea != Screen.safeArea)
+            {
+                _cachedSafeArea = Screen.safeArea;
+                XRLoader.RecalculateRectangles(_cachedSafeArea);
+            }
         }
 
         [DllImport(ApiConstants.CardboardApi)]
