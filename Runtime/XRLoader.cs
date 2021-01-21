@@ -22,6 +22,7 @@ namespace Google.XR.Cardboard
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using UnityEngine;
+    using UnityEngine.Rendering;
     using UnityEngine.XR;
     using UnityEngine.XR.Management;
 
@@ -37,9 +38,19 @@ namespace Google.XR.Cardboard
         private static List<XRInputSubsystemDescriptor> _inputSubsystemDescriptors =
             new List<XRInputSubsystemDescriptor>();
 
-        private Texture2D _closeTexture;
+        private static Texture2D _closeTexture;
 
-        private Texture2D _gearTexture;
+        private static Texture2D _gearTexture;
+
+        /// <summary>
+        /// Pairs the native enum to set the graphics API being used.
+        /// </summary>
+        private enum CardboardGraphicsApi
+        {
+            kOpenGlEs2 = 1,
+            kOpenGlEs3 = 2,
+            kNone = -1,
+        }
 
         /// <summary>
         /// Gets a value indicating whether the subsystems are initialized or not.
@@ -117,6 +128,52 @@ namespace Google.XR.Cardboard
             return true;
         }
 
+        /// <summary>
+        /// Sets the screen parameters and the widgets in the VR scene.
+        /// </summary>
+        ///
+        /// <param name="renderingArea">
+        /// The rectangle where the VR scene will be rendered.
+        /// </param>
+        internal static void RecalculateRectangles(Rect renderingArea)
+        {
+            // TODO(b/171702321): Remove this method once the safe area size could be properly
+            // fetched by the XRLoader.
+            CardboardUnity_setScreenParams(
+                    (int)renderingArea.x, (int)renderingArea.y, (int)renderingArea.width,
+                    (int)renderingArea.height);
+
+            RectInt closeRect = Widget.CloseButtonRenderRect;
+            RectInt gearRect = Widget.GearButtonRenderRect;
+            RectInt alignmentRect = Widget.AlignmentRect;
+            CardboardUnity_setWidgetCount(3);
+            CardboardUnity_setWidgetParams(
+                    0, _closeTexture.GetNativeTexturePtr(), closeRect.x, closeRect.y,
+                    closeRect.width, closeRect.height);
+            CardboardUnity_setWidgetParams(
+                    1, _gearTexture.GetNativeTexturePtr(), gearRect.x, gearRect.y, gearRect.width,
+                    gearRect.height);
+            CardboardUnity_setWidgetParams(
+                    2, Texture2D.whiteTexture.GetNativeTexturePtr(), alignmentRect.x,
+                    alignmentRect.y, alignmentRect.width, alignmentRect.height);
+        }
+
+        /// <summary>
+        /// Sets which Graphics API is being used by Unity to the native implementation.
+        /// </summary>
+        private static void SetGraphicsApi()
+        {
+            switch (SystemInfo.graphicsDeviceType)
+            {
+                case GraphicsDeviceType.OpenGLES2:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs2);
+                    break;
+                case GraphicsDeviceType.OpenGLES3:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs3);
+                    break;
+            }
+        }
+
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setScreenParams(
             int x, int y, int width, int height);
@@ -127,6 +184,9 @@ namespace Google.XR.Cardboard
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setWidgetParams(
             int i, IntPtr texture, int x, int y, int width, int height);
+
+        [DllImport(ApiConstants.CardboardApi)]
+        private static extern void CardboardUnity_setGraphicsApi(CardboardGraphicsApi graphics_api);
 
 #if UNITY_ANDROID
         [DllImport(ApiConstants.CardboardApi)]
@@ -150,31 +210,16 @@ namespace Google.XR.Cardboard
             CardboardUnity_initializeAndroid(activity.GetRawObject());
 #endif
 
-            // Safe area is required because notch in the screen. If the device does not have any
-            // notch, it will be equivalent to:
-            // CardboardUnity_setScreenParams(0, 0, Screen.width, Screen.height);
-            CardboardUnity_setScreenParams(
-                    (int)Screen.safeArea.x, (int)Screen.safeArea.y, (int)Screen.safeArea.width,
-                    (int)Screen.safeArea.height);
-
             _closeTexture = Resources.Load<Texture2D>("Cardboard/quantum_ic_close_white_24");
             DontDestroyOnLoad(_closeTexture);
             _gearTexture = Resources.Load<Texture2D>("Cardboard/quantum_ic_settings_white_24");
             DontDestroyOnLoad(_gearTexture);
 
-            RectInt closeRect = Widget.CloseButtonRenderRect;
-            RectInt gearRect = Widget.GearButtonRenderRect;
-            RectInt alignmentRect = Widget.AlignmentRect;
-            CardboardUnity_setWidgetCount(3);
-            CardboardUnity_setWidgetParams(
-                    0, _closeTexture.GetNativeTexturePtr(), closeRect.x, closeRect.y,
-                    closeRect.width, closeRect.height);
-            CardboardUnity_setWidgetParams(
-                    1, _gearTexture.GetNativeTexturePtr(), gearRect.x, gearRect.y, gearRect.width,
-                    gearRect.height);
-            CardboardUnity_setWidgetParams(
-                    2, Texture2D.whiteTexture.GetNativeTexturePtr(), alignmentRect.x,
-                    alignmentRect.y, alignmentRect.width, alignmentRect.height);
+            SetGraphicsApi();
+
+            // Safe area is required to avoid rendering behind the notch. If the device does not
+            // have any notch, it will be equivalent to the full screen area.
+            RecalculateRectangles(Screen.safeArea);
         }
 
         /// <summary>

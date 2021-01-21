@@ -56,5 +56,7 @@ public class XRCardboardStartup : MonoBehaviour
         {
             Api.ReloadDeviceParams();
         }
+
+        Api.UpdateScreenParams();
     }
 }

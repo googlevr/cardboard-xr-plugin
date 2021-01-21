@@ -32,6 +32,12 @@ The SDK release notes are available on the
 [releases](//github.com/googlevr/cardboard-xr-plugin/releases) page.
 
 
+## Roadmap
+
+The project roadmap is available on the
+[Projects](https://github.com/googlevr/cardboard/projects/1) page.
+
+
 ## Contributing
 
 Please read and follow the steps in [CONTRIBUTING.md](/CONTRIBUTING.md) file.
