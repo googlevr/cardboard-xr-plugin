@@ -1,12 +1,15 @@
 {
     "name": "com.google.xr.cardboard",
-    "displayName": "Google Cardboard XR Plugin for Unity",
+    "displayName": "Google Cardboard XR Plugin with 6DoF support",
     "version": "1.4.1",
     "unity": "2019.3",
-    "description": "Provides rendering and input support for Google Cardboard.",
+    "description": "Provides rendering and input support for Google Cardboard. It adds 6DoF support and is compatible with the Aryzon XR headsets.",
     "keywords": [
+        "aryzon",
+        "6dof",
         "google",
         "cardboard",
+        "ar",
         "vr",
         "xr",
         "reality",
@@ -14,8 +17,10 @@
     ],
     "dependencies": {
         "com.unity.xr.management": "3.2.9",
-        "com.unity.xr.legacyinputhelpers": "2.1.4"
-        "com.unity.xr.arfoundation": "*"
+        "com.unity.xr.legacyinputhelpers": "2.1.4",
+        "com.unity.xr.arfoundation" : "4.1.5",
+        "com.unity.xr.arcore" : "4.1.5",
+        "com.unity.xr.arkit" : "4.1.5"
     },
     "samples": [
         {
