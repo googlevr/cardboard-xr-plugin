@@ -113,7 +113,7 @@ namespace Google.XR.Cardboard
 
             Debug.Log("[CardboardApi] Device params found.");
             CardboardQrCode_destroy(encodedDeviceParams);
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             return true;
         }
 
@@ -127,7 +127,7 @@ namespace Google.XR.Cardboard
               return;
             }
 
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             Debug.Log("[CardboardApi] QR Code scanning activity launched.");
             CardboardQrCode_scanQrCodeAndSaveDeviceParams();
         }
@@ -145,7 +145,7 @@ namespace Google.XR.Cardboard
               return false;
             }
 
-            return _deviceParamsCount != CardboardQrCode_getQrCodeScanCount();
+            return _deviceParamsCount != CardboardQrCode_getDeviceParamsChangedCount();
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Google.XR.Cardboard
 
             // TODO(b/156501367):  Move this logic to the XR display provider.
             Debug.Log("[CardboardApi] Reload device parameters.");
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             CardboardUnity_setDeviceParametersChanged();
         }
 
@@ -200,7 +200,7 @@ namespace Google.XR.Cardboard
         private static extern void CardboardQrCode_destroy(IntPtr encodedDeviceParams);
 
         [DllImport(ApiConstants.CardboardApi)]
-        private static extern int CardboardQrCode_getQrCodeScanCount();
+        private static extern int CardboardQrCode_getDeviceParamsChangedCount();
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setDeviceParametersChanged();
