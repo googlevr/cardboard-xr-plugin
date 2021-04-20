@@ -49,6 +49,7 @@ namespace Google.XR.Cardboard
         {
             kOpenGlEs2 = 1,
             kOpenGlEs3 = 2,
+            kMetal = 3,
             kNone = -1,
         }
 
@@ -140,8 +141,8 @@ namespace Google.XR.Cardboard
             // TODO(b/171702321): Remove this method once the safe area size could be properly
             // fetched by the XRLoader.
             CardboardUnity_setScreenParams(
-                    (int)renderingArea.x, (int)renderingArea.y, (int)renderingArea.width,
-                    (int)renderingArea.height);
+                    (int)Screen.width, (int)Screen.height, (int)renderingArea.x,
+                    (int)renderingArea.y, (int)renderingArea.width, (int)renderingArea.height);
 
             RectInt closeRect = Widget.CloseButtonRenderRect;
             RectInt gearRect = Widget.GearButtonRenderRect;
@@ -171,12 +172,18 @@ namespace Google.XR.Cardboard
                 case GraphicsDeviceType.OpenGLES3:
                     CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs3);
                     break;
+#if UNITY_IOS
+                case GraphicsDeviceType.Metal:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kMetal);
+                    break;
+#endif
             }
         }
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setScreenParams(
-            int x, int y, int width, int height);
+            int screen_width, int screen_height, int viewport_x, int viewport_y, int viewport_width,
+            int viewport_height);
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setWidgetCount(int count);

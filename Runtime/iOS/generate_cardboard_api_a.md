@@ -7,3 +7,6 @@ build for a specific phone if that suits your needs better). Build the `sdk`
 module, copy the generated `.a` file and replace the `cardboard_api.a` file in
 this folder. Similarly, do the same with the `sdk.bundle` folder and its
 contents if necessary.
+
+Finally, set `IOSurface;OpenGLES;GLKit;Metal;MetalKit;` as the iOS framework
+dependencies in the library [meta file](https://github.com/googlevr/cardboard-xr-plugin/blob/master/Runtime/iOS/cardboard_api.a.meta#L77).

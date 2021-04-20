@@ -74,7 +74,7 @@ PluginImporter:
         AddToEmbeddedBinaries: false
         CPU: AnyCPU
         CompileFlags: 
-        FrameworkDependencies: 
+        FrameworkDependencies: IOSurface;OpenGLES;GLKit;Metal;MetalKit;
   userData: 
   assetBundleName: 
   assetBundleVariant: 

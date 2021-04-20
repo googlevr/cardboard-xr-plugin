@@ -99,7 +99,7 @@ namespace Google.XR.Cardboard
         {
             if (!XRLoader._isInitialized)
             {
-              return false;
+                return false;
             }
 
             IntPtr encodedDeviceParams;
@@ -124,7 +124,7 @@ namespace Google.XR.Cardboard
         {
             if (!XRLoader._isInitialized)
             {
-              return;
+                return;
             }
 
             _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
@@ -142,7 +142,7 @@ namespace Google.XR.Cardboard
             // TODO(b/156501367):  Move this logic to the XR display provider.
             if (!XRLoader._isInitialized || _deviceParamsCount == -1)
             {
-              return false;
+                return false;
             }
 
             return _deviceParamsCount != CardboardQrCode_getQrCodeScanCount();
@@ -155,7 +155,7 @@ namespace Google.XR.Cardboard
         {
             if (!XRLoader._isInitialized)
             {
-              return;
+                return;
             }
 
             // TODO(b/156501367):  Move this logic to the XR display provider.
@@ -194,7 +194,7 @@ namespace Google.XR.Cardboard
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_getSavedDeviceParams(
-          out IntPtr encodedDeviceParams, out int size);
+                out IntPtr encodedDeviceParams, out int size);
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_destroy(IntPtr encodedDeviceParams);
