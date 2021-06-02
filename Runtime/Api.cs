@@ -113,7 +113,7 @@ namespace Google.XR.Cardboard
 
             Debug.Log("[CardboardApi] Device params found.");
             CardboardQrCode_destroy(encodedDeviceParams);
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             return true;
         }
 
@@ -127,9 +127,40 @@ namespace Google.XR.Cardboard
                 return;
             }
 
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             Debug.Log("[CardboardApi] QR Code scanning activity launched.");
             CardboardQrCode_scanQrCodeAndSaveDeviceParams();
+        }
+
+        /// <summary>
+        /// Saves the encoded device parameters provided by an URI.
+        ///
+        /// Expected URI format for:
+        ///     - Cardboard Viewer v1: https://g.co/cardboard
+        ///     - Cardboard Viewer v2: https://google.com/cardboard/cfd?p=deviceParams (for example,
+        ///       https://google.com/cardboard/cfg?p=CgZHb29nbGUSEkNhcmRib2FyZCBJL08gMjAxNR0rGBU9JQHegj0qEAAASEIAAEhCAABIQgAASEJYADUpXA89OggeZnc-Ej6aPlAAYAM).
+        ///
+        /// Redirection is also supported up to a maximum of 5 possible redirects before reaching
+        /// the proper pattern.
+        ///
+        /// Only URIs using HTTPS protocol are supported.
+        /// </summary>
+        ///
+        /// <param name="uri">
+        /// The URI string. See above for supported formats.
+        /// </param>
+        public static void SaveDeviceParams(string uri)
+        {
+            if (!XRLoader._isInitialized)
+            {
+                Debug.LogError(
+                        "Please initialize Cardboard XR loader before calling this function.");
+                return;
+            }
+
+            IntPtr rawUri = Marshal.StringToHGlobalAuto(uri);
+            CardboardQrCode_saveDeviceParams(rawUri, uri.Length);
+            Marshal.FreeHGlobal(rawUri);
         }
 
         /// <summary>
@@ -145,7 +176,7 @@ namespace Google.XR.Cardboard
                 return false;
             }
 
-            return _deviceParamsCount != CardboardQrCode_getQrCodeScanCount();
+            return _deviceParamsCount != CardboardQrCode_getDeviceParamsChangedCount();
         }
 
         /// <summary>
@@ -160,7 +191,7 @@ namespace Google.XR.Cardboard
 
             // TODO(b/156501367):  Move this logic to the XR display provider.
             Debug.Log("[CardboardApi] Reload device parameters.");
-            _deviceParamsCount = CardboardQrCode_getQrCodeScanCount();
+            _deviceParamsCount = CardboardQrCode_getDeviceParamsChangedCount();
             CardboardUnity_setDeviceParametersChanged();
         }
 
@@ -189,8 +220,27 @@ namespace Google.XR.Cardboard
             }
         }
 
+        /// <summary>
+        /// Recenters the head tracker.
+        /// </summary>
+        public static void Recenter()
+        {
+            if (!XRLoader._isInitialized)
+            {
+                Debug.LogError(
+                        "Please initialize Cardboard XR loader before calling this function.");
+                return;
+            }
+
+            CardboardUnity_recenterHeadTracker();
+        }
+
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_scanQrCodeAndSaveDeviceParams();
+
+        [DllImport(ApiConstants.CardboardApi)]
+        private static extern void CardboardQrCode_saveDeviceParams(
+                IntPtr uri, int size);
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_getSavedDeviceParams(
@@ -200,9 +250,12 @@ namespace Google.XR.Cardboard
         private static extern void CardboardQrCode_destroy(IntPtr encodedDeviceParams);
 
         [DllImport(ApiConstants.CardboardApi)]
-        private static extern int CardboardQrCode_getQrCodeScanCount();
+        private static extern int CardboardQrCode_getDeviceParamsChangedCount();
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_setDeviceParametersChanged();
+
+        [DllImport(ApiConstants.CardboardApi)]
+        private static extern void CardboardUnity_recenterHeadTracker();
     }
 }
