@@ -82,9 +82,9 @@ namespace Google.XR.Cardboard
         {
             CardboardSDKInitialize();
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(
-                _displaySubsystemDescriptors, "Display");
+                _displaySubsystemDescriptors, "cardboard display");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(
-                _inputSubsystemDescriptors, "Input");
+                _inputSubsystemDescriptors, "cardboard input");
             _isInitialized = true;
             return true;
         }
