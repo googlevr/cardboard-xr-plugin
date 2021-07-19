@@ -217,6 +217,7 @@ namespace Google.XR.Cardboard
             {
                 _cachedSafeArea = Screen.safeArea;
                 XRLoader.RecalculateRectangles(_cachedSafeArea);
+                ReloadDeviceParams();
             }
         }
 
