@@ -57,6 +57,11 @@ public class CardboardStartup : MonoBehaviour
             Application.Quit();
         }
 
+        if (Api.IsTriggerHeldPressed)
+        {
+            Api.Recenter();
+        }
+
         if (Api.HasNewDeviceParams())
         {
             Api.ReloadDeviceParams();

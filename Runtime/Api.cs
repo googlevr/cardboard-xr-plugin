@@ -31,6 +31,22 @@ namespace Google.XR.Cardboard
     {
         private static int _deviceParamsCount = -1;
         private static Rect _cachedSafeArea;
+        private static ScreenOrientation _cachedScreenOrientation;
+
+        /// <summary>
+        /// Whether a trigger touch started.
+        /// </summary>
+        private static bool _touchStarted = false;
+
+        /// <summary>
+        /// Tracks when the trigger touch sequence begins.
+        /// </summary>
+        private static double _startTouchStamp = 0.0;
+
+        /// <summary>
+        /// See MinTriggerHeldPressedTime property.
+        /// </summary>
+        private static double _minTriggerHeldPressedTime = 3.0;
 
         /// <summary>
         /// Gets a value indicating whether the close button is pressed this frame.
@@ -87,6 +103,74 @@ namespace Google.XR.Cardboard
                 return touch.phase == TouchPhase.Began
                     && !Widget.CloseButtonRect.Contains(touchPosition)
                     && !Widget.GearButtonRect.Contains(touchPosition);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the amount of time the trigger must be held active to be held pressed.
+        /// </summary>
+        public static double MinTriggerHeldPressedTime
+        {
+            get
+            {
+                return _minTriggerHeldPressedTime;
+            }
+
+            set
+            {
+                if (value <= 0.0)
+                {
+                    Debug.LogError(
+                        "[CardboardApi] Trying to set a negative value to "
+                        + "MinTriggerHeldPressedTime.");
+                }
+                else
+                {
+                    _minTriggerHeldPressedTime = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether Cardboard trigger button is held pressed.
+        /// </summary>
+        public static bool IsTriggerHeldPressed
+        {
+            get
+            {
+                if (!XRLoader._isStarted || Input.touchCount == 0)
+                {
+                    return false;
+                }
+
+                Touch touch = Input.GetTouch(0);
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
+                bool retVal = false;
+
+                if (touch.phase == TouchPhase.Began
+                    && !Widget.CloseButtonRect.Contains(touchPosition)
+                    && !Widget.GearButtonRect.Contains(touchPosition))
+                {
+                    _startTouchStamp = Time.time;
+                    _touchStarted = true;
+                }
+                else if (touch.phase == TouchPhase.Ended && _touchStarted)
+                {
+                    if ((Time.time - _startTouchStamp) > MinTriggerHeldPressedTime)
+                    {
+                        retVal = true;
+                    }
+
+                    _touchStarted = false;
+                }
+                else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Canceled)
+                {
+                    // Any other phase to the touch sequence would cause to reset the time count,
+                    // except Stationary which means the touch remains in the same position.
+                    _touchStarted = false;
+                }
+
+                return retVal;
             }
         }
 
@@ -196,22 +280,32 @@ namespace Google.XR.Cardboard
         }
 
         /// <summary>
-        /// Updates screen parameters. This method must be called at framerate to ensure the safe
-        /// area is properly taken into account on iOS devices.
+        /// Updates screen parameters. This method must be called at framerate to ensure the current
+        /// screen orientation is properly taken into account by the head tracker. This method also
+        /// ensures that the safe area size is properly set on iOS devices (see note below).
         ///
-        /// Note: This method is a workaround for
+        /// Note: The safe area size check is a workaround for
         /// <a href=https://fogbugz.unity3d.com/default.asp?1288515_t9gqdh39urj13div>Issue #1288515</a>
         /// in Unity.
         /// </summary>
         public static void UpdateScreenParams()
         {
-            // TODO(b/171702321): Remove this method once the safe area size could be properly
-            // fetched by the XRLoader.
             if (!XRLoader._isInitialized)
             {
+                Debug.LogError(
+                        "Please initialize Cardboard XR loader before calling this function.");
                 return;
             }
 
+            // Only set viewport orientation if it has changed since the last check.
+            if (_cachedScreenOrientation != Screen.orientation)
+            {
+                _cachedScreenOrientation = Screen.orientation;
+                XRLoader.SetViewportOrientation(_cachedScreenOrientation);
+            }
+
+            // TODO(b/171702321): Remove this block once the safe area size can be properly
+            // fetched by the XRLoader.
             // Only recalculate rectangles if safe area size has changed since last check.
             if (_cachedSafeArea != Screen.safeArea)
             {

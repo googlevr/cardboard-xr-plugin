@@ -93,9 +93,9 @@ namespace Google.XR.Cardboard
         {
             CardboardSDKInitialize();
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(
-                _displaySubsystemDescriptors, "Display");
+                _displaySubsystemDescriptors, "CardboardDisplay");
             CreateSubsystem<XRInputSubsystemDescriptor, XRInputSubsystem>(
-                _inputSubsystemDescriptors, "Input");
+                _inputSubsystemDescriptors, "CardboardInput");
             _isInitialized = true;
             return true;
         }
@@ -171,38 +171,15 @@ namespace Google.XR.Cardboard
         }
 
         /// <summary>
-        /// Sets which Graphics API is being used by Unity to the native implementation.
-        /// </summary>
-        private static void SetGraphicsApi()
-        {
-            switch (SystemInfo.graphicsDeviceType)
-            {
-                case GraphicsDeviceType.OpenGLES2:
-                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs2);
-                    break;
-                case GraphicsDeviceType.OpenGLES3:
-                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs3);
-                    break;
-#if UNITY_IOS
-                case GraphicsDeviceType.Metal:
-                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kMetal);
-                    break;
-#endif
-                default:
-                    Debug.LogErrorFormat(
-                      "The Cardboard XR Plugin cannot be initialized given that the selected " +
-                      "Graphics API ({0}) is not supported. Please use OpenGL ES 2.0, " +
-                      "OpenGL ES 3.0 or Metal.", SystemInfo.graphicsDeviceType);
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Sets which viewport orientation is being used by Unity to the native implementation.
         /// </summary>
-        private static void SetViewportOrientation()
+        ///
+        /// <param name="screenOrientation">
+        /// The required screen orientation.
+        /// </param>
+        internal static void SetViewportOrientation(ScreenOrientation screenOrientation)
         {
-            switch (Screen.orientation)
+            switch (screenOrientation)
             {
                 case ScreenOrientation.LandscapeLeft:
                     CardboardUnity_setViewportOrientation(
@@ -225,6 +202,33 @@ namespace Google.XR.Cardboard
                       "Setting landscape left as default.");
                     CardboardUnity_setViewportOrientation(
                         CardboardViewportOrientation.kLandscapeLeft);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Sets which Graphics API is being used by Unity to the native implementation.
+        /// </summary>
+        private static void SetGraphicsApi()
+        {
+            switch (SystemInfo.graphicsDeviceType)
+            {
+                case GraphicsDeviceType.OpenGLES2:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs2);
+                    break;
+                case GraphicsDeviceType.OpenGLES3:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs3);
+                    break;
+#if UNITY_IOS
+                case GraphicsDeviceType.Metal:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kMetal);
+                    break;
+#endif
+                default:
+                    Debug.LogErrorFormat(
+                      "The Cardboard XR Plugin cannot be initialized given that the selected " +
+                      "Graphics API ({0}) is not supported. Please use OpenGL ES 2.0, " +
+                      "OpenGL ES 3.0 or Metal.", SystemInfo.graphicsDeviceType);
                     break;
             }
         }
@@ -276,7 +280,7 @@ namespace Google.XR.Cardboard
             DontDestroyOnLoad(_gearTexture);
 
             SetGraphicsApi();
-            SetViewportOrientation();
+            SetViewportOrientation(Screen.orientation);
 
             // Safe area is required to avoid rendering behind the notch. If the device does not
             // have any notch, it will be equivalent to the full screen area.
