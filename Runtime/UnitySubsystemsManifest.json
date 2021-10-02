@@ -1,15 +1,15 @@
 {
 	"name": "Cardboard",
-	"version": "1.4.1",
+	"version": "1.8.0",
 	"libraryName": "cardboard_api",
 	"displays": [
 		{
-			"id": "Display"
+			"id": "CardboardDisplay"
 		}
 	],
 	"inputs": [
 		{
-			"id": "Input"
+			"id": "CardboardInput"
 		}
 	]
 }

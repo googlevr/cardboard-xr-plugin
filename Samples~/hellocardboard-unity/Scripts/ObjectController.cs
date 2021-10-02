@@ -50,7 +50,7 @@ public class ObjectController : MonoBehaviour
     /// </summary>
     public void Start()
     {
-        _startingPosition = transform.localPosition;
+        _startingPosition = transform.parent.localPosition;
         _myRenderer = GetComponent<Renderer>();
         SetMaterial(false);
     }
@@ -60,20 +60,21 @@ public class ObjectController : MonoBehaviour
     /// </summary>
     public void TeleportRandomly()
     {
-        // Picks a random sibling, moves them somewhere random, activates them,
-        // deactivates ourself.
+        // Picks a random sibling, activates it and deactivates itself.
         int sibIdx = transform.GetSiblingIndex();
         int numSibs = transform.parent.childCount;
         sibIdx = (sibIdx + Random.Range(1, numSibs)) % numSibs;
         GameObject randomSib = transform.parent.GetChild(sibIdx).gameObject;
 
-        // New object's location.
-        float angle = Random.Range(-90, 90);
+        // Computes new object's location.
+        float angle = Random.Range(-Mathf.PI, Mathf.PI);
         float distance = Random.Range(_minObjectDistance, _maxObjectDistance);
         float height = Random.Range(_minObjectHeight, _maxObjectHeight);
         Vector3 newPos = new Vector3(Mathf.Cos(angle) * distance, height,
                                      Mathf.Sin(angle) * distance);
-        randomSib.transform.localPosition = newPos;
+
+        // Moves the parent to the new position (siblings relative distance from their parent is 0).
+        transform.parent.localPosition = newPos;
 
         randomSib.SetActive(true);
         gameObject.SetActive(false);

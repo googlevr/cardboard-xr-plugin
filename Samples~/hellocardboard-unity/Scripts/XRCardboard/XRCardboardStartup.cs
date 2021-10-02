@@ -52,6 +52,16 @@ public class XRCardboardStartup : MonoBehaviour
             Api.ScanDeviceParams();
         }
 
+        if (Api.IsCloseButtonPressed)
+        {
+            Application.Quit();
+        }
+
+        if (Api.IsTriggerHeldPressed)
+        {
+            Api.Recenter();
+        }
+
         if (Api.HasNewDeviceParams())
         {
             Api.ReloadDeviceParams();

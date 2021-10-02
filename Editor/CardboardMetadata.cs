@@ -43,10 +43,10 @@ namespace Google.XR.Cardboard.Editor
         /// <param name="obj">
         /// Settings object.
         /// </param>
-        /// <returns>Settings analysis result.</returns>
+        /// <returns>Settings analysis result. Given that nothing is done, returns true.</returns>
         public bool PopulateNewSettingsInstance(ScriptableObject obj)
         {
-            return false;
+            return true;
         }
 
         private class LoaderMetadata : IXRLoaderMetadata
