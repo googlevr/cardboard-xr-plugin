@@ -36,14 +36,15 @@ namespace Google.XR.Cardboard.Editor
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget buildTarget, string path)
         {
-            // If we are building for iOS, we need to disable EmbedBitcode support.
             if (buildTarget == BuildTarget.iOS)
             {
-                string projectPath = PBXProject.GetPBXProjectPath(path);
-                string projectConfig = File.ReadAllText(projectPath);
-                projectConfig = projectConfig.Replace("ENABLE_BITCODE = YES",
-                                                      "ENABLE_BITCODE = NO");
-                File.WriteAllText(projectPath, projectConfig);
+                // Note: The meta files removal is a workaround for
+                // <a https://issuetracker.unity3d.com/issues/possibly-ios-unity-meta-files-are-generated-in-the-plugin-directory-and-then-copied-to-plugins-directory-in-the-xcode-build>Issue #1184957</a>
+                // in Unity.
+                FileUtil.DeleteFileOrDirectory(
+                    path + "/Frameworks/com.google.xr.cardboard/Runtime/iOS/sdk.bundle/qrSample.png.meta");
+                FileUtil.DeleteFileOrDirectory(
+                    path + "/Frameworks/com.google.xr.cardboard/Runtime/iOS/sdk.bundle/tickmarks.png.meta");
             }
         }
     }
