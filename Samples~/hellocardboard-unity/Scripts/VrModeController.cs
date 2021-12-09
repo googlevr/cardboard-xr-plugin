@@ -27,6 +27,14 @@ using UnityEngine.XR.Management;
 /// </summary>
 public class VrModeController : MonoBehaviour
 {
+    // Field of view value to be used when the scene is not in VR mode. In case
+    // XR isn't initialized on startup, this value could be taken from the main
+    // camera and stored.
+    private const float _defaultFieldOfView = 60.0f;
+
+    // Main camera from the scene.
+    private Camera _mainCamera;
+
     /// <summary>
     /// Gets a value indicating whether the screen has been touched this frame.
     /// </summary>
@@ -54,6 +62,9 @@ public class VrModeController : MonoBehaviour
     /// </summary>
     public void Start()
     {
+        // Saves the main camera from the scene.
+        _mainCamera = Camera.main;
+
         // Configures the app to not shut down the screen and sets the brightness to maximum.
         // Brightness control is expected to work only in iOS, see:
         // https://docs.unity3d.com/ScriptReference/Screen-brightness.html.
@@ -159,5 +170,8 @@ public class VrModeController : MonoBehaviour
         Debug.Log("Deinitializing XR...");
         XRGeneralSettings.Instance.Manager.DeinitializeLoader();
         Debug.Log("XR deinitialized.");
+
+        _mainCamera.ResetAspect();
+        _mainCamera.fieldOfView = _defaultFieldOfView;
     }
 }
