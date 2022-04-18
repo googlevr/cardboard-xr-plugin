@@ -91,6 +91,10 @@ namespace Google.XR.Cardboard
         /// <returns>Whether or not initialization succeeded.</returns>
         public override bool Initialize()
         {
+#if UNITY_INPUT_SYSTEM
+            InputLayoutLoader.RegisterInputLayouts();
+#endif
+
             CardboardSDKInitialize();
             CreateSubsystem<XRDisplaySubsystemDescriptor, XRDisplaySubsystem>(
                 _displaySubsystemDescriptors, "CardboardDisplay");
