@@ -16,11 +16,22 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if UNITY_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
+#define USE_NEW_INPUT
+#endif
+
 using System.Collections;
 using Google.XR.Cardboard;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
+
+#if USE_NEW_INPUT
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+#endif
 
 /// <summary>
 /// Turns VR mode on and off.
@@ -42,7 +53,12 @@ public class VrModeController : MonoBehaviour
     {
         get
         {
+#if USE_NEW_INPUT
+            TouchControl touch = GetFirstTouchIfExists();
+            return touch != null && touch.phase.ReadValue() == TouchPhase.Began;
+#else
             return Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began;
+#endif
         }
     }
 
@@ -174,4 +190,28 @@ public class VrModeController : MonoBehaviour
         _mainCamera.ResetAspect();
         _mainCamera.fieldOfView = _defaultFieldOfView;
     }
+
+#if USE_NEW_INPUT
+    static TouchControl GetFirstTouchIfExists()
+    {
+        Touchscreen touchScreen = Touchscreen.current;
+        if (touchScreen == null)
+        {
+            return null;
+        }
+
+        if (!touchScreen.enabled)
+        {
+            InputSystem.EnableDevice(touchScreen);
+        }
+
+        ReadOnlyArray<TouchControl> touches = touchScreen.touches;
+        if (touches.Count == 0)
+        {
+            return null;
+        }
+
+        return touches[0];
+    }
+#endif
 }

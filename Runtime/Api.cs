@@ -16,6 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if UNITY_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
+#define USE_NEW_INPUT
+#endif
+
 namespace Google.XR.Cardboard
 {
     using System;
@@ -23,6 +27,13 @@ namespace Google.XR.Cardboard
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using UnityEngine;
+
+#if USE_NEW_INPUT
+    using UnityEngine.InputSystem;
+    using UnityEngine.InputSystem.Controls;
+    using UnityEngine.InputSystem.Utilities;
+    using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+#endif
 
     /// <summary>
     /// Cardboard XR Plugin API.
@@ -55,7 +66,23 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (!XRLoader._isStarted || Input.touchCount == 0)
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+#if USE_NEW_INPUT
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == TouchPhase.Began 
+                    && Widget.CloseButtonRect.Contains(touchPosition);
+#else
+                if (Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -64,6 +91,7 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
                 return touch.phase == TouchPhase.Began
                     && Widget.CloseButtonRect.Contains(touchPosition);
+#endif
             }
         }
 
@@ -74,7 +102,23 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (!XRLoader._isStarted || Input.touchCount == 0)
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+#if USE_NEW_INPUT
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == TouchPhase.Began
+                    && Widget.GearButtonRect.Contains(touchPosition);
+#else
+                if (Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -83,6 +127,7 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
                 return touch.phase == TouchPhase.Began
                     && Widget.GearButtonRect.Contains(touchPosition);
+#endif
             }
         }
 
@@ -93,7 +138,24 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (!XRLoader._isStarted || Input.touchCount == 0)
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+#if USE_NEW_INPUT
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == TouchPhase.Began
+                    && !Widget.CloseButtonRect.Contains(touchPosition)
+                    && !Widget.GearButtonRect.Contains(touchPosition);
+#else
+                if (Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -103,6 +165,7 @@ namespace Google.XR.Cardboard
                 return touch.phase == TouchPhase.Began
                     && !Widget.CloseButtonRect.Contains(touchPosition)
                     && !Widget.GearButtonRect.Contains(touchPosition);
+#endif
             }
         }
 
@@ -138,7 +201,49 @@ namespace Google.XR.Cardboard
         {
             get
             {
-                if (!XRLoader._isStarted || Input.touchCount == 0)
+
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+#if USE_NEW_INPUT
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                bool retVal = false;
+
+                TouchPhase phase = touch.phase.ReadValue();
+                if (phase == TouchPhase.Began
+                    && !Widget.CloseButtonRect.Contains(touchPosition)
+                    && !Widget.GearButtonRect.Contains(touchPosition))
+                {
+                    _startTouchStamp = Time.time;
+                    _touchStarted = true;
+                }
+                else if (phase == TouchPhase.Ended && _touchStarted)
+                {
+                    if ((Time.time - _startTouchStamp) > MinTriggerHeldPressedTime)
+                    {
+                        retVal = true;
+                    }
+
+                    _touchStarted = false;
+                }
+                else if (phase == TouchPhase.Moved || phase == TouchPhase.Canceled)
+                {
+                    // Any other phase to the touch sequence would cause to reset the time count,
+                    // except Stationary which means the touch remains in the same position.
+                    _touchStarted = false;
+                }
+
+                return retVal;
+#else
+                if (Input.touchCount == 0)
                 {
                     return false;
                 }
@@ -171,6 +276,7 @@ namespace Google.XR.Cardboard
                 }
 
                 return retVal;
+#endif
             }
         }
 
@@ -329,6 +435,30 @@ namespace Google.XR.Cardboard
 
             CardboardUnity_recenterHeadTracker();
         }
+
+#if USE_NEW_INPUT
+        internal static TouchControl GetFirstTouchIfExists()
+        {
+            Touchscreen touchScreen = Touchscreen.current;
+            if (touchScreen == null)
+            {
+                return null;
+            }
+
+            if (!touchScreen.enabled)
+            {
+                InputSystem.EnableDevice(touchScreen);
+            }
+
+            ReadOnlyArray<TouchControl> touches = touchScreen.touches;
+            if (touches.Count == 0)
+            {
+                return null;
+            }
+
+            return touches[0];
+        }
+#endif
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_scanQrCodeAndSaveDeviceParams();
