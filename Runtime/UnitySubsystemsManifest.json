@@ -1,7 +1,7 @@
 {
 	"name": "Cardboard",
-	"version": "1.14.0",
-	"libraryName": "cardboard_api",
+	"version": "1.15.0",
+	"libraryName": "GfxPluginCardboard",
 	"displays": [
 		{
 			"id": "CardboardDisplay"

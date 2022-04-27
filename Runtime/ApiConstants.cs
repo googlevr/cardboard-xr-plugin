@@ -21,7 +21,7 @@ namespace Google.XR.Cardboard
     internal static class ApiConstants
     {
 #if UNITY_ANDROID
-        public const string CardboardApi = "cardboard_api";
+        public const string CardboardApi = "GfxPluginCardboard";
 #elif UNITY_IOS
         public const string CardboardApi = "__Internal";
 #else
