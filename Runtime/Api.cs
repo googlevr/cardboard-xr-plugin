@@ -30,7 +30,6 @@ namespace Google.XR.Cardboard
     public static class Api
     {
         private static int _deviceParamsCount = -1;
-        private static Rect _cachedSafeArea;
         private static ScreenOrientation _cachedScreenOrientation;
 
         /// <summary>
@@ -163,10 +162,13 @@ namespace Google.XR.Cardboard
 
                     _touchStarted = false;
                 }
-                else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Canceled)
+                else if (touch.phase == TouchPhase.Canceled)
                 {
                     // Any other phase to the touch sequence would cause to reset the time count,
                     // except Stationary which means the touch remains in the same position.
+
+                    // The timer isn't reset when the TouchPhase is equal to Moved so as to improve
+                    // usability.
                     _touchStarted = false;
                 }
 
@@ -281,12 +283,7 @@ namespace Google.XR.Cardboard
 
         /// <summary>
         /// Updates screen parameters. This method must be called at framerate to ensure the current
-        /// screen orientation is properly taken into account by the head tracker. This method also
-        /// ensures that the safe area size is properly set on iOS devices (see note below).
-        ///
-        /// Note: The safe area size check is a workaround for
-        /// <a href=https://fogbugz.unity3d.com/default.asp?1288515_t9gqdh39urj13div>Issue #1288515</a>
-        /// in Unity.
+        /// screen orientation is properly taken into account by the head tracker.
         /// </summary>
         public static void UpdateScreenParams()
         {
@@ -302,15 +299,7 @@ namespace Google.XR.Cardboard
             {
                 _cachedScreenOrientation = Screen.orientation;
                 XRLoader.SetViewportOrientation(_cachedScreenOrientation);
-            }
-
-            // TODO(b/171702321): Remove this block once the safe area size can be properly
-            // fetched by the XRLoader.
-            // Only recalculate rectangles if safe area size has changed since last check.
-            if (_cachedSafeArea != Screen.safeArea)
-            {
-                _cachedSafeArea = Screen.safeArea;
-                XRLoader.RecalculateRectangles(_cachedSafeArea);
+                XRLoader.RecalculateRectangles(Screen.safeArea);
                 ReloadDeviceParams();
             }
         }

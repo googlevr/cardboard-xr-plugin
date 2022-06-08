@@ -149,8 +149,6 @@ namespace Google.XR.Cardboard
         /// </param>
         internal static void RecalculateRectangles(Rect renderingArea)
         {
-            // TODO(b/171702321): Remove this method once the safe area size could be properly
-            // fetched by the XRLoader.
             CardboardUnity_setScreenParams(
                     (int)Screen.width, (int)Screen.height, (int)renderingArea.x,
                     (int)renderingArea.y, (int)renderingArea.width, (int)renderingArea.height);
