@@ -50,6 +50,7 @@ namespace Google.XR.Cardboard
             kOpenGlEs2 = 1,
             kOpenGlEs3 = 2,
             kMetal = 3,
+            kVulkan = 4,
             kNone = -1,
         }
 
@@ -220,6 +221,11 @@ namespace Google.XR.Cardboard
 #if UNITY_IOS
                 case GraphicsDeviceType.Metal:
                     CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kMetal);
+                    break;
+#endif
+#if UNITY_ANDROID
+                case GraphicsDeviceType.Vulkan:
+                    CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kVulkan);
                     break;
 #endif
                 default:
