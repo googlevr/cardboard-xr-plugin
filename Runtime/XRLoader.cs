@@ -42,6 +42,8 @@ namespace Google.XR.Cardboard
 
         private static Texture2D _gearTexture;
 
+        private static Texture2D _whiteLineTexture;
+
         /// <summary>
         /// Pairs the native enum to set the graphics API being used.
         /// </summary>
@@ -165,7 +167,7 @@ namespace Google.XR.Cardboard
                     1, _gearTexture.GetNativeTexturePtr(), gearRect.x, gearRect.y, gearRect.width,
                     gearRect.height);
             CardboardUnity_setWidgetParams(
-                    2, Texture2D.whiteTexture.GetNativeTexturePtr(), alignmentRect.x,
+                    2, _whiteLineTexture.GetNativeTexturePtr(), alignmentRect.x,
                     alignmentRect.y, alignmentRect.width, alignmentRect.height);
         }
 
@@ -282,6 +284,8 @@ namespace Google.XR.Cardboard
             DontDestroyOnLoad(_closeTexture);
             _gearTexture = Resources.Load<Texture2D>("Cardboard/quantum_ic_settings_white_24");
             DontDestroyOnLoad(_gearTexture);
+            _whiteLineTexture = Resources.Load<Texture2D>("Cardboard/quantum_ic_line_white_24");
+            DontDestroyOnLoad(_whiteLineTexture);
 
             SetGraphicsApi();
             SetViewportOrientation(Screen.orientation);
@@ -292,12 +296,13 @@ namespace Google.XR.Cardboard
         }
 
         /// <summary>
-        /// Close and gear button textures are preserved until the XR provider is deinitialized.
+        /// Widgets textures are preserved until the XR provider is deinitialized.
         /// </summary>
         private void CardboardSDKDeinitialize()
         {
             Resources.UnloadAsset(_closeTexture);
             Resources.UnloadAsset(_gearTexture);
+            Resources.UnloadAsset(_whiteLineTexture);
         }
     }
 }
