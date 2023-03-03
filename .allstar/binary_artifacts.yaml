@@ -1,0 +1,4 @@
+# Ignore reason: These files are required in Cardboard XR Plugin's implementation.
+ignorePaths:
+- Runtime/Android/GfxPluginCardboard.aar
+- Runtime/iOS/GfxPluginCardboard.a

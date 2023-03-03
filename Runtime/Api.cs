@@ -31,6 +31,7 @@ namespace Google.XR.Cardboard
     {
         private static int _deviceParamsCount = -1;
         private static ScreenOrientation _cachedScreenOrientation;
+        private static Rect _cachedScreenSafeArea;
 
         /// <summary>
         /// Whether a trigger touch started.
@@ -294,12 +295,25 @@ namespace Google.XR.Cardboard
                 return;
             }
 
-            // Only set viewport orientation if it has changed since the last check.
-            if (_cachedScreenOrientation != Screen.orientation)
+            // Reload devices param if either the viewport orientation or the safe area has changed
+            // since the last check.
+            if (_cachedScreenOrientation != Screen.orientation ||
+                _cachedScreenSafeArea != Screen.safeArea)
             {
-                _cachedScreenOrientation = Screen.orientation;
-                XRLoader.SetViewportOrientation(_cachedScreenOrientation);
-                XRLoader.RecalculateRectangles(Screen.safeArea);
+                // Change the viewport orientation if it has changed.
+                if (_cachedScreenOrientation != Screen.orientation)
+                {
+                    _cachedScreenOrientation = Screen.orientation;
+                    XRLoader.SetViewportOrientation(_cachedScreenOrientation);
+                }
+
+                // Recalculate rectangles if the safe area has changed.
+                if (_cachedScreenSafeArea != Screen.safeArea)
+                {
+                    _cachedScreenSafeArea = Screen.safeArea;
+                    XRLoader.RecalculateRectangles(Screen.safeArea);
+                }
+
                 ReloadDeviceParams();
             }
         }
