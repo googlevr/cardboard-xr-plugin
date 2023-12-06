@@ -153,18 +153,29 @@ public class CardboardReticlePointer : MonoBehaviour
             if (_gazedAtObject != hit.transform.gameObject)
             {
                 // New GameObject.
-                _gazedAtObject?.SendMessage("OnPointerExit");
+                if (IsInteractive(_gazedAtObject))
+                {
+                    _gazedAtObject?.SendMessage("OnPointerExit");
+                }
+
                 _gazedAtObject = hit.transform.gameObject;
-                _gazedAtObject.SendMessage("OnPointerEnter");
+
+                if (IsInteractive(_gazedAtObject))
+                {
+                    _gazedAtObject.SendMessage("OnPointerEnter");
+                }
             }
 
-            bool isInteractive = (1 << _gazedAtObject.layer & ReticleInteractionLayerMask) != 0;
-            SetParams(hit.distance, isInteractive);
+            SetParams(hit.distance, IsInteractive(_gazedAtObject));
         }
         else
         {
             // No GameObject detected in front of the camera.
-            _gazedAtObject?.SendMessage("OnPointerExit");
+            if (IsInteractive(_gazedAtObject))
+            {
+                _gazedAtObject?.SendMessage("OnPointerExit");
+            }
+
             _gazedAtObject = null;
             ResetParams();
         }
@@ -172,7 +183,10 @@ public class CardboardReticlePointer : MonoBehaviour
         // Checks for screen touches.
         if (Google.XR.Cardboard.Api.IsTriggerPressed)
         {
-            _gazedAtObject?.SendMessage("OnPointerClick");
+            if (IsInteractive(_gazedAtObject))
+            {
+                _gazedAtObject?.SendMessage("OnPointerClick");
+            }
         }
 
         UpdateDiameters();
@@ -298,5 +312,17 @@ public class CardboardReticlePointer : MonoBehaviour
         mesh.vertices = vertices;
         mesh.triangles = indices;
         mesh.RecalculateBounds();
+    }
+
+    /// <summary>
+    /// Evaluates if the provided GameObject is interactive based on its layer.
+    /// </summary>
+    ///
+    /// <param name="gameObject">The game object on which to check if its layer is interactive.</param>
+    ///
+    /// <returns>Whether or not a GameObject's layer is interactive.</returns>
+    private bool IsInteractive(GameObject gameObject)
+    {
+        return (1 << gameObject?.layer & ReticleInteractionLayerMask) != 0;
     }
 }
