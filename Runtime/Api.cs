@@ -16,6 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
+#if UNITY_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
+#define UNITY_INPUT_SYSTEM_ENABLED
+#endif
+
 namespace Google.XR.Cardboard
 {
     using System;
@@ -23,6 +28,13 @@ namespace Google.XR.Cardboard
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using UnityEngine;
+
+// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
+#if UNITY_INPUT_SYSTEM_ENABLED
+    using UnityEngine.InputSystem;
+    using UnityEngine.InputSystem.Controls;
+    using UnityEngine.InputSystem.Utilities;
+#endif
 
     /// <summary>
     /// Cardboard XR Plugin API.
@@ -55,6 +67,23 @@ namespace Google.XR.Cardboard
         {
             get
             {
+// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
+#if UNITY_INPUT_SYSTEM_ENABLED
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
+                    && Widget.CloseButtonRect.Contains(touchPosition);
+#else
                 if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
@@ -64,6 +93,7 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
                 return touch.phase == TouchPhase.Began
                     && Widget.CloseButtonRect.Contains(touchPosition);
+#endif
             }
         }
 
@@ -74,6 +104,22 @@ namespace Google.XR.Cardboard
         {
             get
             {
+#if UNITY_INPUT_SYSTEM_ENABLED
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
+                    && Widget.GearButtonRect.Contains(touchPosition);
+#else
                 if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
@@ -83,6 +129,7 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
                 return touch.phase == TouchPhase.Began
                     && Widget.GearButtonRect.Contains(touchPosition);
+#endif
             }
         }
 
@@ -93,6 +140,23 @@ namespace Google.XR.Cardboard
         {
             get
             {
+#if UNITY_INPUT_SYSTEM_ENABLED
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
+                    && !Widget.CloseButtonRect.Contains(touchPosition)
+                    && !Widget.GearButtonRect.Contains(touchPosition);
+#else
                 if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
@@ -103,31 +167,7 @@ namespace Google.XR.Cardboard
                 return touch.phase == TouchPhase.Began
                     && !Widget.CloseButtonRect.Contains(touchPosition)
                     && !Widget.GearButtonRect.Contains(touchPosition);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the amount of time the trigger must be held active to be held pressed.
-        /// </summary>
-        public static double MinTriggerHeldPressedTime
-        {
-            get
-            {
-                return _minTriggerHeldPressedTime;
-            }
-
-            set
-            {
-                if (value <= 0.0)
-                {
-                    Debug.LogError(
-                        "[CardboardApi] Trying to set a negative value to "
-                        + "MinTriggerHeldPressedTime.");
-                }
-                else
-                {
-                    _minTriggerHeldPressedTime = value;
-                }
+#endif
             }
         }
 
@@ -138,6 +178,50 @@ namespace Google.XR.Cardboard
         {
             get
             {
+#if UNITY_INPUT_SYSTEM_ENABLED
+                if (!XRLoader._isStarted)
+                {
+                    return false;
+                }
+
+                TouchControl touch = GetFirstTouchIfExists();
+                if (touch == null)
+                {
+                    return false;
+                }
+
+                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
+                bool retVal = false;
+
+                UnityEngine.InputSystem.TouchPhase phase = touch.phase.ReadValue();
+                if (phase == UnityEngine.InputSystem.TouchPhase.Began
+                    && !Widget.CloseButtonRect.Contains(touchPosition)
+                    && !Widget.GearButtonRect.Contains(touchPosition))
+                {
+                    _startTouchStamp = Time.time;
+                    _touchStarted = true;
+                }
+                else if (phase == UnityEngine.InputSystem.TouchPhase.Ended && _touchStarted)
+                {
+                    if ((Time.time - _startTouchStamp) > MinTriggerHeldPressedTime)
+                    {
+                        retVal = true;
+                    }
+
+                    _touchStarted = false;
+                }
+                else if (phase == UnityEngine.InputSystem.TouchPhase.Canceled)
+                {
+                    // Any other phase to the touch sequence would cause to reset the time count,
+                    // except Stationary which means the touch remains in the same position.
+
+                    // The timer isn't reset when the UnityEngine.InputSystem.TouchPhase is equal
+                    // to Moved so as to improve usability.
+                    _touchStarted = false;
+                }
+
+                return retVal;
+#else
                 if (!XRLoader._isStarted || Input.touchCount == 0)
                 {
                     return false;
@@ -174,6 +258,32 @@ namespace Google.XR.Cardboard
                 }
 
                 return retVal;
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the amount of time the trigger must be held active to be held pressed.
+        /// </summary>
+        public static double MinTriggerHeldPressedTime
+        {
+            get
+            {
+                return _minTriggerHeldPressedTime;
+            }
+
+            set
+            {
+                if (value <= 0.0)
+                {
+                    Debug.LogError(
+                        "[CardboardApi] Trying to set a negative value to "
+                        + "MinTriggerHeldPressedTime.");
+                }
+                else
+                {
+                    _minTriggerHeldPressedTime = value;
+                }
             }
         }
 
@@ -332,6 +442,38 @@ namespace Google.XR.Cardboard
 
             CardboardUnity_recenterHeadTracker();
         }
+
+#if UNITY_INPUT_SYSTEM_ENABLED
+        /// <summary>
+        /// Checks if the screen has been touched during the current frame.
+        /// </summary>
+        ///
+        /// <returns>
+        /// The first touch of the screen during the current frame. Ir the screen hasn't been
+        /// touched, returns null.
+        /// </returns>
+        private static TouchControl GetFirstTouchIfExists()
+        {
+            Touchscreen touchScreen = Touchscreen.current;
+            if (touchScreen == null)
+            {
+                return null;
+            }
+
+            if (!touchScreen.enabled)
+            {
+                InputSystem.EnableDevice(touchScreen);
+            }
+
+            ReadOnlyArray<TouchControl> touches = touchScreen.touches;
+            if (touches.Count == 0)
+            {
+                return null;
+            }
+
+            return touches[0];
+        }
+#endif
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_scanQrCodeAndSaveDeviceParams();

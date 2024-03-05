@@ -214,9 +214,11 @@ namespace Google.XR.Cardboard
         {
             switch (SystemInfo.graphicsDeviceType)
             {
+#if !UNITY_2023_1_OR_NEWER
                 case GraphicsDeviceType.OpenGLES2:
                     CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs2);
                     break;
+#endif
                 case GraphicsDeviceType.OpenGLES3:
                     CardboardUnity_setGraphicsApi(CardboardGraphicsApi.kOpenGlEs3);
                     break;
@@ -233,8 +235,8 @@ namespace Google.XR.Cardboard
                 default:
                     Debug.LogErrorFormat(
                       "The Cardboard XR Plugin cannot be initialized given that the selected " +
-                      "Graphics API ({0}) is not supported. Please use OpenGL ES 2.0, " +
-                      "OpenGL ES 3.0 or Metal.", SystemInfo.graphicsDeviceType);
+                      "Graphics API ({0}) is not supported. Please use OpenGL ES, Vulkan " +
+                      "or Metal, according to the target platform.", SystemInfo.graphicsDeviceType);
                     break;
             }
         }

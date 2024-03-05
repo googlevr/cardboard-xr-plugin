@@ -34,9 +34,11 @@ public class GraphicsAPITextController : MonoBehaviour
         TextMesh tm = gameObject.GetComponent(typeof(TextMesh)) as TextMesh;
         switch (SystemInfo.graphicsDeviceType)
         {
+#if !UNITY_2023_1_OR_NEWER
             case GraphicsDeviceType.OpenGLES2:
                 tm.text = "OpenGL ES 2";
                 break;
+#endif
             case GraphicsDeviceType.OpenGLES3:
                 tm.text = "OpenGL ES 3";
                 break;

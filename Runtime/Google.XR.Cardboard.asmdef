@@ -1,7 +1,8 @@
 {
     "name": "Google.XR.Cardboard",
     "references": [
-        "Unity.XR.Management"
+        "Unity.XR.Management",
+        "Unity.InputSystem"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -10,5 +11,12 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0",
+            "define": "UNITY_INPUT_SYSTEM"
+        }
+    ]
 }
