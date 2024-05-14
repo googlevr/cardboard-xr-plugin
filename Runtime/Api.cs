@@ -16,11 +16,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
-#if UNITY_INPUT_SYSTEM && ENABLE_INPUT_SYSTEM
-#define UNITY_INPUT_SYSTEM_ENABLED
-#endif
-
 namespace Google.XR.Cardboard
 {
     using System;
@@ -28,13 +23,9 @@ namespace Google.XR.Cardboard
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using UnityEngine;
-
-// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
-#if UNITY_INPUT_SYSTEM_ENABLED
     using UnityEngine.InputSystem;
     using UnityEngine.InputSystem.Controls;
     using UnityEngine.InputSystem.Utilities;
-#endif
 
     /// <summary>
     /// Cardboard XR Plugin API.
@@ -67,8 +58,6 @@ namespace Google.XR.Cardboard
         {
             get
             {
-// TODO(b/230625249): Remove macro once Unity's Input Manager is removed.
-#if UNITY_INPUT_SYSTEM_ENABLED
                 if (!XRLoader._isStarted)
                 {
                     return false;
@@ -83,17 +72,6 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
                 return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
                     && Widget.CloseButtonRect.Contains(touchPosition);
-#else
-                if (!XRLoader._isStarted || Input.touchCount == 0)
-                {
-                    return false;
-                }
-
-                Touch touch = Input.GetTouch(0);
-                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
-                return touch.phase == TouchPhase.Began
-                    && Widget.CloseButtonRect.Contains(touchPosition);
-#endif
             }
         }
 
@@ -104,7 +82,6 @@ namespace Google.XR.Cardboard
         {
             get
             {
-#if UNITY_INPUT_SYSTEM_ENABLED
                 if (!XRLoader._isStarted)
                 {
                     return false;
@@ -119,17 +96,6 @@ namespace Google.XR.Cardboard
                 Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position.ReadValue());
                 return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
                     && Widget.GearButtonRect.Contains(touchPosition);
-#else
-                if (!XRLoader._isStarted || Input.touchCount == 0)
-                {
-                    return false;
-                }
-
-                Touch touch = Input.GetTouch(0);
-                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
-                return touch.phase == TouchPhase.Began
-                    && Widget.GearButtonRect.Contains(touchPosition);
-#endif
             }
         }
 
@@ -140,7 +106,6 @@ namespace Google.XR.Cardboard
         {
             get
             {
-#if UNITY_INPUT_SYSTEM_ENABLED
                 if (!XRLoader._isStarted)
                 {
                     return false;
@@ -156,18 +121,6 @@ namespace Google.XR.Cardboard
                 return touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began
                     && !Widget.CloseButtonRect.Contains(touchPosition)
                     && !Widget.GearButtonRect.Contains(touchPosition);
-#else
-                if (!XRLoader._isStarted || Input.touchCount == 0)
-                {
-                    return false;
-                }
-
-                Touch touch = Input.GetTouch(0);
-                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
-                return touch.phase == TouchPhase.Began
-                    && !Widget.CloseButtonRect.Contains(touchPosition)
-                    && !Widget.GearButtonRect.Contains(touchPosition);
-#endif
             }
         }
 
@@ -178,7 +131,6 @@ namespace Google.XR.Cardboard
         {
             get
             {
-#if UNITY_INPUT_SYSTEM_ENABLED
                 if (!XRLoader._isStarted)
                 {
                     return false;
@@ -221,44 +173,6 @@ namespace Google.XR.Cardboard
                 }
 
                 return retVal;
-#else
-                if (!XRLoader._isStarted || Input.touchCount == 0)
-                {
-                    return false;
-                }
-
-                Touch touch = Input.GetTouch(0);
-                Vector2Int touchPosition = Vector2Int.RoundToInt(touch.position);
-                bool retVal = false;
-
-                if (touch.phase == TouchPhase.Began
-                    && !Widget.CloseButtonRect.Contains(touchPosition)
-                    && !Widget.GearButtonRect.Contains(touchPosition))
-                {
-                    _startTouchStamp = Time.time;
-                    _touchStarted = true;
-                }
-                else if (touch.phase == TouchPhase.Ended && _touchStarted)
-                {
-                    if ((Time.time - _startTouchStamp) > MinTriggerHeldPressedTime)
-                    {
-                        retVal = true;
-                    }
-
-                    _touchStarted = false;
-                }
-                else if (touch.phase == TouchPhase.Canceled)
-                {
-                    // Any other phase to the touch sequence would cause to reset the time count,
-                    // except Stationary which means the touch remains in the same position.
-
-                    // The timer isn't reset when the TouchPhase is equal to Moved so as to improve
-                    // usability.
-                    _touchStarted = false;
-                }
-
-                return retVal;
-#endif
             }
         }
 
@@ -443,7 +357,6 @@ namespace Google.XR.Cardboard
             CardboardUnity_recenterHeadTracker();
         }
 
-#if UNITY_INPUT_SYSTEM_ENABLED
         /// <summary>
         /// Checks if the screen has been touched during the current frame.
         /// </summary>
@@ -473,7 +386,6 @@ namespace Google.XR.Cardboard
 
             return touches[0];
         }
-#endif
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardQrCode_scanQrCodeAndSaveDeviceParams();
