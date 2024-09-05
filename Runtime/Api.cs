@@ -358,6 +358,25 @@ namespace Google.XR.Cardboard
         }
 
         /// <summary>
+        /// Sets the head tracker's low pass filter to stabilize the pose.
+        /// </summary>
+        /// <param name="velocity_filter_cutoff_frequency">
+        /// Cutoff frequency for the velocity filter of the head tracker.
+        /// head tracker.
+        /// </param>
+        public static void SetLowPassFilter(int velocity_filter_cutoff_frequency)
+        {
+            if (!XRLoader._isInitialized)
+            {
+                Debug.LogError(
+                        "Please initialize Cardboard XR loader before calling this function.");
+                return;
+            }
+
+            CardboardUnity_setHeadTrackerLowPassFilter(velocity_filter_cutoff_frequency);
+        }
+
+        /// <summary>
         /// Checks if the screen has been touched during the current frame.
         /// </summary>
         ///
@@ -409,5 +428,9 @@ namespace Google.XR.Cardboard
 
         [DllImport(ApiConstants.CardboardApi)]
         private static extern void CardboardUnity_recenterHeadTracker();
+
+        [DllImport(ApiConstants.CardboardApi)]
+        private static extern void CardboardUnity_setHeadTrackerLowPassFilter(int
+                velocity_filter_cutoff_frequency);
     }
 }
