@@ -45,6 +45,8 @@ namespace Google.XR.Cardboard.Editor
                     path + "/Frameworks/com.google.xr.cardboard/Runtime/iOS/sdk.bundle/qrSample.png.meta");
                 FileUtil.DeleteFileOrDirectory(
                     path + "/Frameworks/com.google.xr.cardboard/Runtime/iOS/sdk.bundle/tickmarks.png.meta");
+                FileUtil.DeleteFileOrDirectory(
+                    path + "/Frameworks/com.google.xr.cardboard/Runtime/iOS/sdk.bundle/resolutions.csv.meta");
 
                 // Note: SDK binaries no longer contain bitcode, as
                 // <a https://developer.apple.com/documentation/Xcode-Release-Notes/xcode-14-release-notes>Apple has deprecated bitcode</a>.
