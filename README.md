@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> Do not file issues here. Please file issues at the [Cardboard SDK repository](https://github.com/googlevr/cardboard/issue) to report any bugs, ask questions or request specific features.
+> Do not file issues here. Please file issues at the [Cardboard SDK repository](https://github.com/googlevr/cardboard/issues) to report any bugs, ask questions or request specific features.
 
 Google Cardboard XR Plugin for Unity
 ====================================
