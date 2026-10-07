@@ -39,6 +39,15 @@ namespace Google.XR.Cardboard
         private const int _buttonPaddingDp = 9;
 
         /// <summary>
+        /// Additional offset from the screen safe-area border in device-independent pixels.
+        /// </summary>
+#if UNITY_ANDROID
+        private const int _buttonOffsetDp = 11;
+#else
+        private const int _buttonOffsetDp = 0;
+#endif
+
+        /// <summary>
         /// Width of the alignment rectangle in device-independent pixels.
         /// </summary>
         private const int _alignmentWidthDp = 2;
@@ -56,9 +65,10 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = new RectInt();
-                rect.x = (int)Screen.safeArea.xMin;
+                rect.x = (int)Screen.safeArea.xMin + DpToPixels(_buttonOffsetDp);
                 rect.width = DpToPixels(_buttonSizeDp);
-                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp);
+                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp)
+                                                    - DpToPixels(_buttonOffsetDp);
                 rect.height = DpToPixels(_buttonSizeDp);
                 return rect;
             }
@@ -92,9 +102,11 @@ namespace Google.XR.Cardboard
             get
             {
                 RectInt rect = new RectInt();
-                rect.x = (int)Screen.safeArea.xMax - DpToPixels(_buttonSizeDp);
+                rect.x = (int)Screen.safeArea.xMax - DpToPixels(_buttonSizeDp)
+                                                        - DpToPixels(_buttonOffsetDp);
                 rect.width = DpToPixels(_buttonSizeDp);
-                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp);
+                rect.y = (int)Screen.safeArea.yMax - DpToPixels(_buttonSizeDp)
+                                                        - DpToPixels(_buttonOffsetDp);
                 rect.height = DpToPixels(_buttonSizeDp);
                 return rect;
             }
